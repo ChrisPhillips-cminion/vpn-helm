@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "vpn.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "vpn.name" . }}
+    helm.sh/chart: {{ include "vpn.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 4500
+      targetPort: 4500
+      protocol: UDP
+      name:  port4500
+    - port: 500
+      targetPort: 500
+      protocol: UDP
+      name:  port500
+  externalIPs:
+    - {{ .Values.EXTERNALIP }}
+  selector:
+    app.kubernetes.io/name: {{ include "vpn.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

@@ -1,0 +1,48 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ include "vpn.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "vpn.name" . }}
+    helm.sh/chart: {{ include "vpn.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "vpn.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "vpn.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      volumes:
+      - name:  vol
+        persistentVolumeClaim:
+          claimName: {{ include "vpn.fullname" . }}
+      containers:
+        - name:   {{ include "vpn.name" . }}
+          image: hwdsl2/ipsec-vpn-server
+          securityContext:
+            allowPrivilegeEscalation: true
+            privileged:  true
+          ports:
+            - name: port500
+              containerPort: 500
+              protocol: UDP
+            - name: port4500
+              containerPort: 4500
+              protocol: UDP
+          env :
+          - name: VPN_IPSEC_PSK
+            value: {{ .Values.VPN_IPSEC_PSK }}
+          - name: VPN_USER
+            value: {{ .Values.VPN_USER}}
+          - name: VPN_PASSWORD
+            value: {{ .Values.VPN_PASSWORD }}
+          volumeMounts:
+          - mountPath: "/lib/modules"
+            name: vol

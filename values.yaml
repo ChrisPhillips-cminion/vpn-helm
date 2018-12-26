@@ -1,0 +1,9 @@
+# Default values for vpn.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+VPN_IPSEC_PSK: shared-password
+VPN_USER: cminion
+VPN_PASSWORD: password
+#Public IP
+EXTERNALIP: 1.1.1.1
